@@ -4,10 +4,6 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  // Connection URLs are configured via prisma.config.ts in Prisma 7+.
-  // Remove the `url` field from the schema and provide the connection
-  // to the PrismaClient constructor (adapter or accelerateUrl) or
-  // configure Migrate in prisma.config.ts. See https://pris.ly/d/config-datasource
 }
 
 model User {
