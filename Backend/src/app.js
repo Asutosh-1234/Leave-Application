@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import "dotenv/config";
 import healthCheck  from "./routers/healthCheck.router.js";
 import authRouter from "./routers/auth.router.js";
+import leaveApplicationRouter from "./routers/leaveApplication.router.js";
 import { ApiError } from "./utilities/api-error.js";
 
 const app = express()
@@ -15,6 +16,7 @@ app.use(cookieParser())
 
 app.use("/",healthCheck)
 app.use("/api/v1/auth", authRouter)
+app.use("/api/v1/leaves", leaveApplicationRouter)
 
 // Global Error Handler
 app.use((err, req, res, next) => {
