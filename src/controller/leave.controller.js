@@ -9,5 +9,5 @@ const applyLeave = asyncHandler(async (req, res)=>{
   if(!reason || !details){
     throw new ApiError(400, "reason or details is missing");
   }
-  
+  const userID = req.user.userId
 })

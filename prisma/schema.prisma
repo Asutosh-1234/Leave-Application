@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -7,15 +8,16 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  name          String         @db.VarChar(55)
-  email         String         @unique @db.VarChar(150)
+  id            String  @id @default(uuid())
+  name          String  @db.VarChar(55)
+  email         String  @unique @db.VarChar(150)
   password      String
+  role          Role    @default(user)
   refresh_token String?
   access_token  String?
 
-  created_at    DateTime       @default(now())
-  updated_at    DateTime       @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   leaveRequests LeaveRequest[]
 
@@ -23,11 +25,11 @@ model User {
 }
 
 model LeaveRequest {
-  id         String   @id @default(uuid())
-  user_id    String
-  date       DateTime
-  reason     String?
-  status     Status   @default(pending)
+  id      String   @id @default(uuid())
+  user_id String
+  date    DateTime
+  reason  String?
+  status  Status   @default(pending)
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -41,4 +43,9 @@ enum Status {
   pending
   approved
   canceled
+}
+
+enum Role {
+  user
+  admin
 }
