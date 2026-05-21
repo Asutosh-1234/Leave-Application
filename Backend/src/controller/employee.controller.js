@@ -6,6 +6,9 @@ import { asyncHandler } from "../utilities/async-handler.js";
 const userCreateLeave = asyncHandler(async (req, res) => {
   const { reason, date, details } = req.body;
 
+  console.log(reason, date);
+  
+
   if (!date || !reason) {
     throw new ApiError(400, "Date and reason are required");
   }

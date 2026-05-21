@@ -8,6 +8,7 @@ import {
 import {
   adminUpdateLeave,
   adminGetAllApplication,
+  adminGetApplicationById
 } from "../controller/admin.controller.js";
 import { verifyJWT, verifyRole } from "../middleware/auth.middleware.js";
 
@@ -27,6 +28,7 @@ router.delete("/:id", userDeleteLeave);
 const requireAdmin = verifyRole("admin");
 
 router.get("/admin/all", requireAdmin, adminGetAllApplication);
+router.get("/admin/:id", requireAdmin, adminGetApplicationById);
 router.put("/admin/:id", requireAdmin, adminUpdateLeave);
 
 export default router;

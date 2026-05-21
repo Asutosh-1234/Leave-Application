@@ -64,7 +64,17 @@ const adminGetApplicationById = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Leave request ID is required in URL parameters");
   }
 
-  const application = await prisma.leaveRequest.findUnique({ where: { id } });
+  const application = await prisma.leaveRequest.findUnique({ 
+    where: { id },
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+        }
+      }
+    }
+  });
 
   if (!application) {
     throw new ApiError(404, "Leave request not found");
@@ -76,4 +86,4 @@ const adminGetApplicationById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, application, `leave application as per the ID`));
 });
 
-export { adminUpdateLeave, adminGetAllApplication };
+export { adminUpdateLeave, adminGetAllApplication, adminGetApplicationById};

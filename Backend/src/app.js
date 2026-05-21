@@ -16,7 +16,7 @@ app.use(cookieParser())
 
 app.use("/",healthCheck)
 app.use("/api/v1/auth", authRouter)
-app.use("/api/v1/leaves", leaveApplicationRouter)
+app.use("/api/v1/leave", leaveApplicationRouter)
 
 // Global Error Handler
 app.use((err, req, res, next) => {
