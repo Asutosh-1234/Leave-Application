@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  // Connection URLs are configured via prisma.config.ts in Prisma 7+.
+  // Remove the `url` field from the schema and provide the connection
+  // to the PrismaClient constructor (adapter or accelerateUrl) or
+  // configure Migrate in prisma.config.ts. See https://pris.ly/d/config-datasource
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String         @db.VarChar(55)
+  email         String         @unique @db.VarChar(150)
+  password      String
+  refresh_token String?
+  access_token  String?
+
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+
+  leaveRequests LeaveRequest[]
+
+  @@map("users")
+}
+
+model LeaveRequest {
+  id         String   @id @default(uuid())
+  user_id    String
+  date       DateTime
+  reason     String?
+  status     Status   @default(pending)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("leave_requests")
+}
+
+enum Status {
+  pending
+  approved
+  canceled
+}
