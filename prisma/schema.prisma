@@ -28,8 +28,10 @@ model LeaveRequest {
   id      String   @id @default(uuid())
   user_id String
   date    DateTime
-  reason  String?
+  reason  String
   status  Status   @default(pending)
+  remark  String?   @default("")
+  details String?
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
