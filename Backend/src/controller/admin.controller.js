@@ -35,7 +35,7 @@ const adminUpdateLeave = asyncHandler(async (req, res) => {
 });
 
 const adminGetAllApplication = asyncHandler(async (req, res) => {
-  const { status } = req.body; 
+  const { status } = req.query; 
   
   const whereClause = status ? { status } : {};
 
