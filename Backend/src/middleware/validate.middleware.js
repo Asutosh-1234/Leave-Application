@@ -24,9 +24,10 @@ export const validate = (schema) => (req, res, next) => {
   }
 
   // Mutate req to replace with validated/stripped values
-  if (schema.body) req.body = value.body;
-  if (schema.params) req.params = value.params;
-  if (schema.query) req.query = value.query;
+  // Mutate req to replace with validated/stripped values
+  if (schema.body) Object.assign(req.body, value.body);
+  if (schema.params) Object.assign(req.params, value.params);
+  if (schema.query) Object.assign(req.query, value.query);
 
   return next();
 };
