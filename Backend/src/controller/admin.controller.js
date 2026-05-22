@@ -1,5 +1,4 @@
 import { ApiResponse } from "../utilities/api-response.js";
-import { ApiError } from "../utilities/api-error.js";
 import { asyncHandler } from "../utilities/async-handler.js";
 import { 
   updateLeaveStatusService, 
@@ -10,14 +9,6 @@ import {
 const adminUpdateLeave = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status, remark } = req.body;
-
-  if (!id) {
-    throw new ApiError(400, "Leave request ID is required in URL parameters");
-  }
-
-  if (!status || !["pending", "approved", "canceled"].includes(status)) {
-    throw new ApiError(400, "Valid status (pending, approved, canceled) is required");
-  }
 
   const updatedLeave = await updateLeaveStatusService(id, status, remark);
 
@@ -38,10 +29,6 @@ const adminGetAllApplication = asyncHandler(async (req, res) => {
 
 const adminGetApplicationById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-
-  if (!id) {
-    throw new ApiError(400, "Leave request ID is required in URL parameters");
-  }
 
   const application = await getLeaveApplicationByIdService(id);
 
