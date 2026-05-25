@@ -134,11 +134,11 @@ export function EmployeeDashboard() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-700">Start Date</label>
+                  <label className="block text-sm font-medium mb-1 text-slate-700">Start Date <span className="text-red-700 ml-">*</span></label>
                   <Input type="date" required min={today} value={dateFrom} onChange={e => setDateFrom(e.target.value)} disabled={submitting} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-700">End Date</label>
+                  <label className="block text-sm font-medium mb-1 text-slate-700">End Date <span className="text-red-700 ml-">*</span></label>
                   <Input type="date" required min={dateFrom} value={dateTo} onChange={e => setDateTo(e.target.value)} disabled={submitting} />
                 </div>
               </div>
