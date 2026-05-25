@@ -109,6 +109,8 @@ export function EmployeeDashboard() {
     }
   };
 
+  const today = new Date().toISOString().split("T")[0];
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -133,7 +135,7 @@ export function EmployeeDashboard() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1 text-slate-700">Start Date</label>
-                  <Input type="date" required value={dateFrom} onChange={e => setDateFrom(e.target.value)} disabled={submitting} />
+                  <Input type="date" required min={today} value={dateFrom} onChange={e => setDateFrom(e.target.value)} disabled={submitting} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1 text-slate-700">End Date</label>
@@ -142,7 +144,7 @@ export function EmployeeDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700">Reason (Short)</label>
+                <abel className="block text-sm font-medium mb-1 text-slate-700">Reason (Short)<span className="text-red-700 ml-">*</span></abel>
                 <Input type="text" required placeholder="E.g., Sick Leave" value={reason} onChange={e => setReason(e.target.value)} disabled={submitting} />
               </div>
               <div>
