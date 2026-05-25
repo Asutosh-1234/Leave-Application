@@ -1,11 +1,12 @@
 import prisma from "../utilities/prisma-client.js";
 import { ApiError } from "../utilities/api-error.js";
 
-export const createLeaveService = async (userID, parsedDate, reason, details) => {
+export const createLeaveService = async (userID, parsedDateFrom, parsedDateTo, reason, details) => {
   const newLeave = await prisma.leaveRequest.create({
     data: {
       user_id: userID,
-      date: parsedDate,
+      date_from: parsedDateFrom,
+      date_to: parsedDateTo,
       reason,
       details: details || null,
       status: "pending",
@@ -15,7 +16,7 @@ export const createLeaveService = async (userID, parsedDate, reason, details) =>
   return newLeave;
 };
 
-export const updateLeaveService = async (id, userID, parsedDate, reason, details) => {
+export const updateLeaveService = async (id, userID, parsedDateFrom, parsedDateTo, reason, details) => {
   const existingLeave = await prisma.leaveRequest.findUnique({ where: { id } });
 
   if (!existingLeave) {
@@ -33,7 +34,8 @@ export const updateLeaveService = async (id, userID, parsedDate, reason, details
   const updateData = {};
   if (reason !== undefined) updateData.reason = reason;
   if (details !== undefined) updateData.details = details;
-  if (parsedDate) updateData.date = parsedDate;
+  if (parsedDateFrom) updateData.date_from = parsedDateFrom;
+  if (parsedDateTo) updateData.date_to = parsedDateTo;
 
   const updatedLeave = await prisma.leaveRequest.update({
     where: { id },

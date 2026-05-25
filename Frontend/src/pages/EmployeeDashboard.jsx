@@ -13,7 +13,8 @@ export function EmployeeDashboard() {
   const [editingId, setEditingId] = useState(null);
   
   // Form State
-  const [date, setDate] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [reason, setReason] = useState("");
   const [details, setDetails] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -38,7 +39,8 @@ export function EmployeeDashboard() {
   const resetForm = () => {
     setShowForm(false);
     setEditingId(null);
-    setDate("");
+    setDateFrom("");
+    setDateTo("");
     setReason("");
     setDetails("");
     setError(null);
@@ -55,13 +57,13 @@ export function EmployeeDashboard() {
 
   const handleEditClick = (leave) => {
     setEditingId(leave.id);
-    // Format date string to YYYY-MM-DD for the input
-    const formattedDate = new Date(leave.date).toISOString().split('T')[0];
-    setDate(formattedDate);
+    const formattedDateFrom = new Date(leave.date_from).toISOString().split('T')[0];
+    const formattedDateTo = new Date(leave.date_to).toISOString().split('T')[0];
+    setDateFrom(formattedDateFrom);
+    setDateTo(formattedDateTo);
     setReason(leave.reason);
     setDetails(leave.details || "");
     setShowForm(true);
-    // scroll to top where form is
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -81,16 +83,25 @@ export function EmployeeDashboard() {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
+    
     try {
       if (editingId) {
-        // Update existing leave
-        await api.put(`/leave/${editingId}`, { date, reason, details });
+        await api.put(`/leave/${editingId}`, { 
+          date_from: dateFrom, 
+          date_to: dateTo, 
+          reason, 
+          details 
+        });
       } else {
-        // Create new leave
-        await api.post("/leave", { date, reason, details });
+        await api.post("/leave", { 
+          date_from: dateFrom, 
+          date_to: dateTo, 
+          reason, 
+          details 
+        });
       }
       resetForm();
-      fetchLeaves(); // Refresh list after successful creation/update
+      fetchLeaves();
     } catch (err) {
       setError(err.response?.data?.message || `Failed to ${editingId ? 'update' : 'submit'} request`);
     } finally {
@@ -116,12 +127,20 @@ export function EmployeeDashboard() {
             )}
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+            <form onSubmit={handleSubmit} className="space-y-4 max-w-xl">
               {error && <div className="text-destructive text-sm font-medium">{error}</div>}
-              <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700">Date</label>
-                <Input type="date" required value={date} onChange={e => setDate(e.target.value)} disabled={submitting} />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-slate-700">Start Date</label>
+                  <Input type="date" required value={dateFrom} onChange={e => setDateFrom(e.target.value)} disabled={submitting} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-slate-700">End Date</label>
+                  <Input type="date" required min={dateFrom} value={dateTo} onChange={e => setDateTo(e.target.value)} disabled={submitting} />
+                </div>
               </div>
+
               <div>
                 <label className="block text-sm font-medium mb-1 text-slate-700">Reason (Short)</label>
                 <Input type="text" required placeholder="E.g., Sick Leave" value={reason} onChange={e => setReason(e.target.value)} disabled={submitting} />
@@ -143,7 +162,7 @@ export function EmployeeDashboard() {
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
               <tr>
-                <th className="px-6 py-4 font-medium">Date</th>
+                <th className="px-6 py-4 font-medium">Dates</th>
                 <th className="px-6 py-4 font-medium">Reason</th>
                 <th className="px-6 py-4 font-medium">Status</th>
                 <th className="px-6 py-4 font-medium">Admin Remark</th>
@@ -156,50 +175,56 @@ export function EmployeeDashboard() {
               ) : leaves.length === 0 ? (
                 <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No leave requests found. Enjoy your work!</td></tr>
               ) : (
-                leaves.map(leave => (
-                  <tr key={leave.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 text-slate-900 font-medium">
-                      {new Date(leave.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-slate-900">{leave.reason}</div>
-                      {leave.details && <div className="text-slate-500 text-xs mt-1">{leave.details}</div>}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium uppercase tracking-wider
-                        ${leave.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                          leave.status === 'canceled' ? 'bg-red-100 text-red-800' : 
-                          'bg-yellow-100 text-yellow-800'}`}>
-                        {leave.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-slate-600 italic max-w-[200px] truncate" title={leave.remark}>
-                      {leave.remark ? `"${leave.remark}"` : "-"}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      {leave.status === 'pending' && (
-                        <div className="flex justify-end gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-8 text-xs text-blue-600 border-blue-200 hover:bg-blue-50"
-                            onClick={() => handleEditClick(leave)}
-                          >
-                            Edit
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-8 text-xs text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                            onClick={() => handleDeleteClick(leave.id)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))
+                leaves.map(leave => {
+                  const df = new Date(leave.date_from).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                  const dt = new Date(leave.date_to).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                  const dateStr = df === dt ? df : `${df} — ${dt}`;
+
+                  return (
+                    <tr key={leave.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4 text-slate-900 font-medium whitespace-nowrap">
+                        {dateStr}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-slate-900">{leave.reason}</div>
+                        {leave.details && <div className="text-slate-500 text-xs mt-1">{leave.details}</div>}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium uppercase tracking-wider
+                          ${leave.status === 'approved' ? 'bg-green-100 text-green-800' : 
+                            leave.status === 'canceled' ? 'bg-red-100 text-red-800' : 
+                            'bg-yellow-100 text-yellow-800'}`}>
+                          {leave.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600 italic max-w-[200px] truncate" title={leave.remark}>
+                        {leave.remark ? `"${leave.remark}"` : "-"}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        {leave.status === 'pending' && (
+                          <div className="flex justify-end gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 text-xs text-blue-600 border-blue-200 hover:bg-blue-50"
+                              onClick={() => handleEditClick(leave)}
+                            >
+                              Edit
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 text-xs text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                              onClick={() => handleDeleteClick(leave.id)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>

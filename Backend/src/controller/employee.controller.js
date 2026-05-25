@@ -8,11 +8,14 @@ import {
 } from "../services/employee.service.js";
 
 const userCreateLeave = asyncHandler(async (req, res) => {
-  const { reason, date, details } = req.body;
+  // Input Validation is handled by Joi middleware
+  const { reason, date_from, date_to, details } = req.body;
   const userID = req.user.id;
-  const parsedDate = new Date(date);
+  
+  const parsedDateFrom = new Date(date_from);
+  const parsedDateTo = new Date(date_to);
 
-  const newLeave = await createLeaveService(userID, parsedDate, reason, details);
+  const newLeave = await createLeaveService(userID, parsedDateFrom, parsedDateTo, reason, details);
 
   return res
     .status(201)
@@ -20,14 +23,17 @@ const userCreateLeave = asyncHandler(async (req, res) => {
 });
 
 const userUpdateLeave = asyncHandler(async (req, res) => {
+  // Input Validation is handled by Joi middleware
   const { id } = req.params;
-  const { reason, date, details } = req.body;
+  const { reason, date_from, date_to, details } = req.body;
   const userID = req.user.id;
 
-  let parsedDate = null;
-  if (date) parsedDate = new Date(date);
+  let parsedDateFrom = null;
+  let parsedDateTo = null;
+  if (date_from) parsedDateFrom = new Date(date_from);
+  if (date_to) parsedDateTo = new Date(date_to);
 
-  const updatedLeave = await updateLeaveService(id, userID, parsedDate, reason, details);
+  const updatedLeave = await updateLeaveService(id, userID, parsedDateFrom, parsedDateTo, reason, details);
 
   return res
     .status(200)

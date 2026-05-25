@@ -31,6 +31,7 @@ export function AdminDashboard() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchLeaves();
   }, []);
 
@@ -47,7 +48,6 @@ export function AdminDashboard() {
         delete newRemarks[id];
         return newRemarks;
       });
-      // if updating from modal, we should also close it or refresh it. Let's just close it.
       setSelectedLeave(null);
       fetchLeaves();
     } catch (err) {
@@ -60,7 +60,6 @@ export function AdminDashboard() {
 
   const handleViewDetails = async (id) => {
     setLoadingDetails(true);
-    // Even though we have the object in the list, we fetch the fresh single application details as requested
     try {
       const res = await api.get(`/leave/admin/${id}`);
       setSelectedLeave(res.data.data);
@@ -101,7 +100,7 @@ export function AdminDashboard() {
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
               <tr>
                 <th className="px-6 py-4 font-medium">Employee</th>
-                <th className="px-6 py-4 font-medium">Date</th>
+                <th className="px-6 py-4 font-medium">Dates</th>
                 <th className="px-6 py-4 font-medium">Reason</th>
                 <th className="px-6 py-4 font-medium">Status</th>
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
@@ -113,14 +112,19 @@ export function AdminDashboard() {
               ) : filteredLeaves.length === 0 ? (
                 <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No leave requests found for this filter.</td></tr>
               ) : (
-                filteredLeaves.map(leave => (
+                filteredLeaves.map(leave => {
+                  const df = new Date(leave.date_from).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                  const dt = new Date(leave.date_to).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                  const dateStr = df === dt ? df : `${df} - ${dt}`;
+
+                  return (
                   <tr key={leave.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-semibold text-slate-900">{leave.user?.name}</div>
                       <div className="text-slate-500 text-xs">{leave.user?.email}</div>
                     </td>
-                    <td className="px-6 py-4 text-slate-900 font-medium">
-                      {new Date(leave.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                    <td className="px-6 py-4 text-slate-900 font-medium whitespace-nowrap">
+                      {dateStr}
                     </td>
                     <td className="px-6 py-4 max-w-xs">
                       <div className="font-medium text-slate-900 truncate">{leave.reason}</div>
@@ -147,7 +151,8 @@ export function AdminDashboard() {
                       </div>
                     </td>
                   </tr>
-                ))
+                )
+                })
               )}
             </tbody>
           </table>
@@ -182,16 +187,18 @@ export function AdminDashboard() {
                     <label className="block text-xs font-medium text-slate-500 uppercase">Employee Email</label>
                     <div className="font-medium text-slate-900 mt-1">{selectedLeave.user?.email}</div>
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-500 uppercase">Leave Date</label>
-                    <div className="font-medium text-slate-900 mt-1">
-                      {new Date(selectedLeave.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                  <div className="col-span-2 flex gap-8">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-500 uppercase">Start Date</label>
+                      <div className="font-medium text-slate-900 mt-1">
+                        {new Date(selectedLeave.date_from).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-500 uppercase">Applied On</label>
-                    <div className="font-medium text-slate-900 mt-1">
-                      {new Date(selectedLeave.createdAt || selectedLeave.date).toLocaleDateString()}
+                    <div>
+                      <label className="block text-xs font-medium text-slate-500 uppercase">End Date</label>
+                      <div className="font-medium text-slate-900 mt-1">
+                        {new Date(selectedLeave.date_to).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}
+                      </div>
                     </div>
                   </div>
                 </div>

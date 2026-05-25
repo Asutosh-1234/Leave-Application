@@ -2,9 +2,14 @@ import Joi from "joi";
 
 export const createLeaveSchema = {
   body: Joi.object({
-    date: Joi.date().iso().required().messages({
-      "date.format": "Invalid date format",
-      "any.required": "Date is required"
+    date_from: Joi.date().iso().required().messages({
+      "date.format": "Invalid date_from format",
+      "any.required": "Start date is required"
+    }),
+    date_to: Joi.date().iso().min(Joi.ref('date_from')).required().messages({
+      "date.format": "Invalid date_to format",
+      "any.required": "End date is required",
+      "date.min": "End date must be on or after the start date"
     }),
     reason: Joi.string().required().messages({
       "string.empty": "Reason is required"
@@ -21,13 +26,21 @@ export const updateLeaveSchema = {
     })
   }),
   body: Joi.object({
-    date: Joi.date().iso().optional().messages({
-      "date.format": "Invalid date format"
+    date_from: Joi.date().iso().optional().messages({
+      "date.format": "Invalid date_from format"
+    }),
+    date_to: Joi.date().iso().min(Joi.ref('date_from')).optional().messages({
+      "date.format": "Invalid date_to format",
+      "date.min": "End date must be on or after the start date"
     }),
     reason: Joi.string().optional(),
     details: Joi.string().allow(null, "").optional()
-  }).min(1).messages({
-    "object.min": "You must provide at least one field to update"
+  })
+  .with('date_from', 'date_to')
+  .with('date_to', 'date_from')
+  .min(1).messages({
+    "object.min": "You must provide at least one field to update",
+    "object.with": "Both start date and end date must be provided together if updating dates"
   })
 };
 
