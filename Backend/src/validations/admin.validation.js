@@ -20,7 +20,14 @@ export const adminGetAllSchema = {
   query: Joi.object({
     status: Joi.string().valid("pending", "approved", "canceled").optional().messages({
       "any.only": "Valid query status (pending, approved, canceled) is allowed"
-    })
+    }),
+    date_from: Joi.date().iso().optional().messages({
+      "date.format": "Invalid date_from format"
+    }),
+    date_to: Joi.date().iso().min(Joi.ref('date_from')).optional().messages({
+      "date.format": "Invalid date_to format",
+      "date.min": "End date must be on or after the start date"
+    }),
   })
 };
 

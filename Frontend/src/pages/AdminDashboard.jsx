@@ -10,6 +10,8 @@ export function AdminDashboard() {
   
   // Filtering
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterDateFrom, setFilterDateFrom] = useState("");
+  const [filterDateTo, setFilterDateTo] = useState("");
 
   // Action State
   const [updatingId, setUpdatingId] = useState(null);
@@ -21,7 +23,13 @@ export function AdminDashboard() {
 
   const fetchLeaves = async () => {
     try {
-      const res = await api.get("/leave/admin/all");
+      setLoading(true);
+      const params = {};
+      if (filterStatus !== "all") params.status = filterStatus;
+      if (filterDateFrom) params.date_from = filterDateFrom;
+      if (filterDateTo) params.date_to = filterDateTo;
+
+      const res = await api.get("/leave/admin/all", { params });
       setLeaves(res.data.data);
     } catch (err) {
       console.error(err);
@@ -33,7 +41,7 @@ export function AdminDashboard() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchLeaves();
-  }, []);
+  }, [filterStatus, filterDateFrom, filterDateTo]);
 
   const handleRemarkChange = (id, value) => {
     setRemarks(prev => ({ ...prev, [id]: value }));
@@ -71,26 +79,46 @@ export function AdminDashboard() {
     }
   };
 
-  const filteredLeaves = leaves.filter(l => filterStatus === "all" || l.status === filterStatus);
+  const filteredLeaves = leaves;
 
   return (
     <div className="space-y-6 relative">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-slate-800">All Leave Requests</h1>
         
-        {/* Filter Dropdown */}
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-slate-600">Filter by Status:</label>
-          <select 
-            className="h-9 px-3 rounded-md border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="all">All</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="canceled">Canceled</option>
-          </select>
+        {/* Filters */}
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-slate-600">From:</label>
+            <input 
+              type="date"
+              className="h-9 px-3 rounded-md border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+              value={filterDateFrom}
+              onChange={(e) => setFilterDateFrom(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-slate-600">To:</label>
+            <input 
+              type="date"
+              className="h-9 px-3 rounded-md border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+              value={filterDateTo}
+              onChange={(e) => setFilterDateTo(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-slate-600">Status:</label>
+            <select 
+              className="h-9 px-3 rounded-md border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="canceled">Canceled</option>
+            </select>
+          </div>
         </div>
       </div>
 

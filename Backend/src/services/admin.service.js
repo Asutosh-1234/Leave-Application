@@ -19,8 +19,22 @@ export const updateLeaveStatusService = async (id, status, remark) => {
   return updatedLeave;
 };
 
-export const getAllCompanyLeavesService = async (status) => {
-  const whereClause = status ? { status } : {};
+export const getAllCompanyLeavesService = async (status, date_from, date_to) => {
+  const whereClause = {};
+
+  if (status && status !== "all") {
+    whereClause.status = status;
+  }
+
+  if (date_from || date_to) {
+    whereClause.date_from = {};
+    if (date_from) {
+      whereClause.date_from.gte = new Date(date_from);
+    }
+    if (date_to) {
+      whereClause.date_from.lte = new Date(date_to);
+    }
+  }
 
   const leaves = await prisma.leaveRequest.findMany({
     orderBy: { created_at: 'desc' },

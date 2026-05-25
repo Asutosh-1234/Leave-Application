@@ -18,9 +18,9 @@ const adminUpdateLeave = asyncHandler(async (req, res) => {
 });
 
 const adminGetAllApplication = asyncHandler(async (req, res) => {
-  const { status } = req.query; 
+  const { status, date_from, date_to } = req.query; 
   
-  const leaves = await getAllCompanyLeavesService(status);
+  const leaves = await getAllCompanyLeavesService(status, date_from, date_to);
 
   return res
     .status(200)
