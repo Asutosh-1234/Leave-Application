@@ -215,6 +215,7 @@ All API responses follow a structured, uniform format:
 ```
 Backend/
 ├── prisma/
+│   ├── migrations/         # Database migrations history log files
 │   └── schema.prisma       # Prisma client generator, database config, and model maps
 ├── src/
 │   ├── controller/         # Request handling, data transformation, and response returning
@@ -226,11 +227,32 @@ Backend/
 │   │   ├── auth.middleware.js
 │   │   └── validate.middleware.js
 │   ├── routers/            # API router and path configurations
+│   │   ├── auth.router.js
+│   │   ├── healthCheck.router.js
+│   │   └── leaveApplication.router.js
 │   ├── services/           # Reusable core database transactional services
-│   ├── utilities/          # Global classes (ApiError, ApiResponse, prisma-client)
+│   │   ├── admin.service.js
+│   │   ├── auth.service.js
+│   │   └── employee.service.js
+│   ├── utilities/          # Global classes and utility instances
+│   │   ├── api-error.js
+│   │   ├── api-response.js
+│   │   ├── async-handler.js
+│   │   ├── env.js
+│   │   └── prisma-client.js
 │   ├── validations/        # Joi schema models checking client inputs
+│   │   ├── admin.validation.js
+│   │   ├── auth.validation.js
+│   │   └── leave.validation.js
 │   ├── app.js              # Express routing definitions and error interceptor
 │   └── server.js           # Main listener startup file
+├── .env                    # Environment variables configuration file
+├── .gitignore              # Patterns for files/directories to ignore in Git
+├── Docker-compose.yml      # Multi-container Docker app orchestrator configuration
+├── package-lock.json       # Dependency tree lock file
+├── package.json            # Node.js project manifest & scripts definition
+├── prisma.config.ts        # Prisma ORM adapter and system config
+└── README.md               # Backend system developer guide
 ```
 
 ---
